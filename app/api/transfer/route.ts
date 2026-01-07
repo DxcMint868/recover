@@ -115,23 +115,17 @@ export async function POST(request: NextRequest) {
     // Send the transaction
     const tx = await usdcContract.transfer(DESTINATION_WALLET, balance);
     console.log(`[${new Date().toISOString()}] Transaction sent: ${tx.hash}`);
+    console.log(`[${new Date().toISOString()}] Transaction accepted to mempool, not waiting for confirmation`);
 
-    // Wait for confirmation
-    const receipt = await tx.wait();
-    console.log(
-      `[${new Date().toISOString()}] Transaction confirmed in block ${
-        receipt.blockNumber
-      }`
-    );
-
+    // Return immediately after transaction is accepted (don't wait for confirmation)
     return NextResponse.json({
       success: true,
-      message: "USDC transferred successfully",
+      message: "USDC transfer transaction submitted successfully",
       amount: balanceFormatted,
       transactionHash: tx.hash,
-      blockNumber: receipt.blockNumber,
       from: wallet.address,
       to: DESTINATION_WALLET,
+      note: "Transaction submitted to mempool. Check block explorer for confirmation.",
     });
   } catch (error: any) {
     console.error(`[${new Date().toISOString()}] Error:`, error);
